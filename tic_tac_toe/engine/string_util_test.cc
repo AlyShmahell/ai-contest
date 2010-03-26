@@ -52,7 +52,7 @@ TEST(StringUtilTest, TokenizeWithDelimitersOnEnds) {
 // Tests the Tokenize method with several delimiters
 TEST(StringUtilTest, TokenizeMultipleDelimiters) {
   std::string s = ".:;Hello^#World!!?";
-  std::vector<std::string> tokens = StringUtil::Tokenize(s);
+  std::vector<std::string> tokens = StringUtil::Tokenize(s, "?!#^;:.");
   ASSERT_EQ(tokens.size(), (unsigned int)2);
   ASSERT_EQ(tokens[0], "Hello");
   ASSERT_EQ(tokens[1], "World");
