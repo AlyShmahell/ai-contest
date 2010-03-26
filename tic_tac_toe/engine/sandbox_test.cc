@@ -10,18 +10,21 @@
 //
 // Author: Jeff Cameron (jeff@jpcameron.com)
 //
-// A basic test of the sandboxing system.
+// Unit tests for the Sandbox class.
 
-#include <iostream>
 #include "tic_tac_toe/engine/sandbox.h"
+#include "gtest/gtest.h"
 
-int main(int argc, char *argv[]) {
+// Tests the sandbox.
+TEST(SandboxTest, EndToEndTest) {
   Sandbox sandbox("./sum");
-  sandbox.Init();
-  sandbox.WriteLine("1 2 3");
+  ASSERT_EQ(sandbox.Init(), 1) << "Sandbox failed to initialize.";
+  ASSERT_EQ(sandbox.WriteLine("1 2 3"), 6) << "Sandbox failed while writing "
+					   << "to spawned process.";
   std::string line;
-  int result = sandbox.ReadLine(line, 1000);
-  std::cout << "Received (" << result << "): " << line << std::endl;
+  ASSERT_EQ(sandbox.ReadLine(line, 1000), 2) << "Sandbox failed while "
+					     << "reading from spawned "
+					     << "process.";
+  ASSERT_EQ(line, "6") << "The sum program returned the wrong sum.";
   sandbox.Kill();
-  return 0;
 }

@@ -15,7 +15,7 @@
 CC=g++
 CPPFLAGS += -Wall -I../.. -I../../third_party/googletest/include
 VPATH = ../../third_party/googletest/make
-TARGETS = engine sandbox_test sum random_bot string_util_test
+TARGETS = engine sum random_bot unit_tests
 
 build: $(TARGETS)
 
@@ -24,11 +24,10 @@ clean:
 
 engine: engine.o grid.o sandbox.o string_util.o
 
-sandbox_test: sandbox_test.o sandbox.o string_util.o
-
 sum: sum.o string_util.o
 
 random_bot: random_bot.o string_util.o
 
-string_util_test: string_util_test.o string_util.o gtest_main.a
+unit_tests: string_util_test.o sandbox_test.o sandbox.o string_util.o \
+	gtest_main.a
 	$(CC) $(CPPFLAGS) -o $@ $^ -lpthread
