@@ -10,7 +10,7 @@
 //
 // Author: Jeff Cameron (jeff@jpcameron.com)
 
-#include "string_util.h"
+#include "tic_tac_toe/engine/string_util.h"
 
 void StringUtil::Tokenize(const std::string& s,
 			  const std::string& delimiters,
@@ -22,4 +22,11 @@ void StringUtil::Tokenize(const std::string& s,
     lastPos = s.find_first_not_of(delimiters, pos);
     pos = s.find_first_of(delimiters, lastPos);
   }
+}
+
+std::vector<std::string> StringUtil::Tokenize(const std::string& s,
+					      const std::string& delimiters) {
+  std::vector<std::string> tokens;
+  Tokenize(s, delimiters, tokens);
+  return tokens;
 }

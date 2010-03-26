@@ -13,11 +13,24 @@
 # Makefile for the Tic-Tac-Toe contest engine.
 
 CC=g++
-CFLAGS += -Wall
+CPPFLAGS += -Wall -I../.. -I../../third_party/googletest/include
 
-all: engine
-
-engine: engine.o sandbox.o string_util.o
+build: engine sandbox_test sum random_bot string_util_test
 
 clean:
 	rm -rf *.o engine
+
+engine: engine.o grid.o sandbox.o string_util.o
+
+sandbox_test: sandbox_test.o sandbox.o string_util.o
+
+sum: sum.o string_util.o
+
+random_bot: random_bot.o string_util.o
+
+string_util_test.o: string_util_test.cc
+	$(CC) $(CPPFLAGS) -c string_util_test.cc
+
+string_util_test: string_util_test.o
+	$(CC) $(CPPFLAGS) -o string_util_test string_util_test.o \
+	string_util.o ../../third_party/googletest/make/gtest_main.a -lpthread

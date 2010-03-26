@@ -21,8 +21,11 @@ class Sandbox {
  public:
   // Sets up the sandbox, but does not invoke it. This constructor sets up a
   // sandbox with no security at all. The spawned process can do whatever it
-  // wants. To actually kick off the command, call the Init() method.
-  Sandbox(const std::string& command);
+  // wants. To actually kick off the command, call the Init() method. If
+  // trap_sterr is true, then the sandbox catches the stderr output of the
+  // spawned program, otherwise the stderr output of the spawned program goes
+  // straight to the terminal.
+  Sandbox(const std::string& command, bool trap_stderr = true);
 
   // Destructor. Destroys the spawned process.
   ~Sandbox();
@@ -35,8 +38,14 @@ class Sandbox {
   void Kill();
 
   // Writes the given string to the stdin channel of the spawned process,
-  // followed by a single newline character (\n).
-  void WriteLine(const std::string& message);
+  // followed by a single newline character (\n). On success, returns the
+  // number of bytes written. On error, -1 is returned.
+  int WriteLine(const std::string& message);
+
+  // Writes the given string to the stdin channel of the spawned process,
+  // without adding a newline character to the end. On success, returns the
+  // number of bytes written. On error, -1 is returned.
+  int Write(const std::string& message);
 
   // Attempts to read a line from the stdout channel of the spawned process.
   // This method does not block.
@@ -47,25 +56,46 @@ class Sandbox {
   // included in the returned character count.
   //
   // If a complete line of the program's output is not yet available, the
-  // method returns zero, and the length of buf will be zero.
+  // method returns zero, and the length of buf will be zero. If an error
+  // occurs, -1 is returned.
   //
   // How can you tell the difference between a blank line being read, and no
   // line being available? If the first case, the return value is nonzero. In
   // the second case, the return value is zero.
   int ReadLine(std::string& buf);
 
+  // A blocking ReadLine. Waits for characters written to the spawned program's
+  // stdout stream until a newline is read, or max_blocking_time milliseconds
+  // have elapsed. Returns the number of characters read.
+  int ReadLine(std::string& buf, int max_blocking_time);
+
   // Reads a line from the spawned program's stderr channel. Works just the
   // same as the ReadLine method, except for stderr instead of stdout.
   int ReadErrorLine(std::string& buf);
 
  private:
-  // Used to store characters that are read from the spawed program's stdout
-  // and stderr channels.
-  std::string program_stdout_;
-  std::string program_stderr_;
+  // Sets a file descriptor to eb non-blocking.
+  int SetNonBlockingIO(int file_descriptor);
+
+  // Three file descriptors that connect to the stdin, stdout, and stderr
+  // streams of the spawned process.
+  int child_stdin_;
+  int child_stdout_;
+  int child_stderr_;
 
   // The shell command to be invoked inside this sandbox.
   std::string command_;
+
+  // The process ID of the spawned process.
+  int pid_;
+
+  // Buffers that store characters that have been read from the spawned
+  // process' stdout and stderr channels.
+  std::string child_stdout_buffer_;
+  std::string child_stderr_buffer_;
+
+  // Whether or not to trap the spawned program's stderr output.
+  bool trap_stderr_;
 };
 
 #endif
