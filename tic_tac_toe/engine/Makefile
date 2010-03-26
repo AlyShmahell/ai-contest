@@ -28,6 +28,6 @@ sum: sum.o string_util.o
 
 random_bot: random_bot.o string_util.o
 
-unit_tests: string_util_test.o sandbox_test.o sandbox.o string_util.o \
-	gtest_main.a
+unit_tests: grid.o grid_test.o gtest_main.a sandbox.o sandbox_test.o \
+	string_util.o string_util_test.o
 	$(CC) $(CPPFLAGS) -o $@ $^ -lpthread
